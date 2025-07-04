@@ -30,8 +30,9 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 # COPY ssh/id_rsa.pub /root/.ssh/id_rsa.pub
 # RUN chmod 644 /root/.ssh/id_rsa.pub
 
-# Configurar el known_hosts para evitar problemas de autenticación
-RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
+# Crear directorio SSH y agregar github.com a known_hosts
+RUN mkdir -p /root/.ssh && \
+    ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 # Clonar el repositorio de Laravel por SSH
 RUN git clone git@github.com:Luisa-mk/Backend-hotelcomfii.git /var/www/html
