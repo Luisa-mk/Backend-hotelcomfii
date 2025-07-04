@@ -14,8 +14,9 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libonig-dev \
     libcurl4-openssl-dev \
+    libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) gd zip pdo pdo_mysql xml curl opcache
+    && docker-php-ext-install -j$(nproc) gd zip pdo pdo_mysql pdo_pgsql pgsql xml curl opcache
 
 # Instalar Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -51,6 +52,9 @@ RUN a2ensite laravel.conf
 
 # Permisos necesarios
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Ejecutar migraciones
+RUN php artisan migrate --force || true
 
 EXPOSE 80
 
