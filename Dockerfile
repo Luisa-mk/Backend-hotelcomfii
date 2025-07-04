@@ -25,10 +25,10 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Copiar nuestras llaves SSH del directorio de ssh al contenedor
-COPY ssh/id_rsa /root/.ssh/id_rsa
-RUN chmod 600 /root/.ssh/id_rsa
-COPY ssh/id_rsa.pub /root/.ssh/id_rsa.pub
-RUN chmod 644 /root/.ssh/id_rsa.pub
+# COPY ssh/id_rsa /root/.ssh/id_rsa
+# RUN chmod 600 /root/.ssh/id_rsa
+# COPY ssh/id_rsa.pub /root/.ssh/id_rsa.pub
+# RUN chmod 644 /root/.ssh/id_rsa.pub
 
 # Configurar el known_hosts para evitar problemas de autenticación
 RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
