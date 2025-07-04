@@ -1,11 +1,10 @@
-# Se utiliza una imagen de PHP 8.2 con apache
 FROM php:8.2-apache
 
-# Habilitar los modulos de apache
+# Habilitar módulos de Apache
 RUN a2enmod rewrite headers
 RUN a2enmod proxy_http
 
-# Instalar las extensiones de PHP necesarias
+# Instalar extensiones PHP
 RUN apt-get update && apt-get install -y \
     git \
     libzip-dev \
@@ -20,11 +19,9 @@ RUN apt-get update && apt-get install -y \
 
 # Instalar Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Habilitar composer allow superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Clonar el repositorio de Laravel por HTTPS (porque es público)
+# Clonar el repositorio de Laravel
 RUN git clone https://github.com/Luisa-mk/Backend-hotelcomfii.git /var/www/html
 
 RUN git config --global --add safe.directory /var/www/html
@@ -33,24 +30,28 @@ RUN git checkout master
 RUN git pull
 RUN composer install
 
-# Instalar Xdebug 3.3.2
+# Instalar Xdebug
 RUN pecl install xdebug-3.3.2 \
     && docker-php-ext-enable xdebug
 
-# Configurar Xdebug
+# Configuración Xdebug
 RUN echo 'xdebug.mode=debug' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo 'xdebug.client_host=host.docker.internal' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo 'xdebug.client_port=9003' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
-# Copiar configuración de Apache para Laravel
+# Copiar laravel.conf
 COPY laravel.conf /etc/apache2/sites-available/laravel.conf
 
-# Habilitar el sitio de Laravel
+# Desactivar el default site
+RUN a2dissite 000-default.conf
+
+# Habilitar laravel.conf
 RUN a2ensite laravel.conf
 
-# Exponer el puerto 80
+# Permisos necesarios
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
 EXPOSE 80
 
-# Iniciar Apache en primer plano (en lugar de php artisan serve)
 CMD ["apache2-foreground"]
