@@ -24,28 +24,14 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Habilitar composer allow superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Copiar nuestras llaves SSH del directorio de ssh al contenedor
-# COPY ssh/id_rsa /root/.ssh/id_rsa
-# RUN chmod 600 /root/.ssh/id_rsa
-# COPY ssh/id_rsa.pub /root/.ssh/id_rsa.pub
-# RUN chmod 644 /root/.ssh/id_rsa.pub
-
-# Crear directorio SSH y agregar github.com a known_hosts
-RUN mkdir -p /root/.ssh && \
-    ssh-keyscan github.com >> /root/.ssh/known_hosts
-
-# Clonar el repositorio de Laravel por SSH
-RUN git clone git@github.com:Luisa-mk/Backend-hotelcomfii.git /var/www/html
+# Clonar el repositorio de Laravel por HTTPS (porque es público)
+RUN git clone https://github.com/Luisa-mk/Backend-hotelcomfii.git /var/www/html
 
 RUN git config --global --add safe.directory /var/www/html
 WORKDIR /var/www/html
 RUN git checkout master
 RUN git pull
 RUN composer install
-# RUN chown -R www-data:www-data /var/www/html
-# RUN chmod -R 755 /var/www/html
-# RUN find /var/www/html -type f -exec chmod 644 {} \;
-# RUN chown -R www-data:www-data /var/www/html/storage
 
 # Instalar Xdebug 3.3.2
 RUN pecl install xdebug-3.3.2 \
